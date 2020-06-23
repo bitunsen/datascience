@@ -74,6 +74,10 @@ class GAExecution:
         key = str(x_cor) + "-" + str(y_cor)
         return self._attacking_point_dictionary[key]
 
+    """
+    This method generates '_size_of_population' number of Chromosomes
+    as part of initial population. 
+    """
     def generate_initial_population(self):
 
         self._current_generation = 1
@@ -102,7 +106,7 @@ class GAExecution:
         if not isinstance(input_chromosome, Chromosome):
             raise TypeError("Invalid argument - Only object of type Chromosome is expected.")
 
-        _data = input_chromosome.get_gene_array()[:]
+        _data = input_chromosome.get_gene_sequence()[:]
         _non_attacking_queen = [0 for i in range(self._length_of_chromosome)]
         for index in range(len(_data)):
             current_point = Gene(index, _data[index])
@@ -239,7 +243,6 @@ class GAExecution:
 if __name__ == "__main__":
 
     number_of_queens = 8
-    valid_data = [i for i in range(number_of_queens)]
     engine = GAExecution(100, number_of_queens, 0.01)
     current_generation = 1
     _max_generation = 2000

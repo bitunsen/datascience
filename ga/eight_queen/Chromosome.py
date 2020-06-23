@@ -11,41 +11,41 @@ It is calculated by dividing the number of unique elements by the length of data
 
 
 class Chromosome:
-    _data_array = []
-    _gene_array = []
+    _data_list = []
+    _gene_list = []
     fitness_score = 0
     _mutate_ratio = 0.0
 
-    def __init__(self, _input_data_array):
-        if not isinstance(_input_data_array, list):
+    def __init__(self, _input_data_list):
+        if not isinstance(_input_data_list, list):
             raise TypeError("Invalid argument passed - only array of positive integers are allowed.")
 
-        if len(_input_data_array) < 2:
+        if len(_input_data_list) < 2:
             raise ValueError("Invalid argument passed - number of elements must be more than 2 in the input array.")
 
-        for _element in _input_data_array:
+        for _element in _input_data_list:
             if not isinstance(_element, int):
                 raise TypeError("Invalid argument passed - only array of positive integers are allowed.")
             if _element < 0:
                 raise TypeError("Invalid argument passed - only array of positive integers are allowed.")
 
-        self._data_array = _input_data_array[:]
-        for i in range(len(_input_data_array)):
-            _point = Gene(i, _input_data_array[i])
-            self._gene_array.append(_point)
-        _mutate_ratio = (len(set(_input_data_array)) / len(_input_data_array))
+        self._data_list = _input_data_list[:]
+        for i in range(len(_input_data_list)):
+            _point = Gene(i, _input_data_list[i])
+            self._gene_list.append(_point)
+        _mutate_ratio = (len(set(_input_data_list)) / len(_input_data_list))
 
     def get_mutate_ratio(self):
         return self._mutate_ratio
 
     def print_chromosome(self, message):
-        gene_size = len(self._data_array)
+        gene_size = len(self._data_list)
         chromosome_str = "["
         for i in range(gene_size):
             if i < (gene_size - 1):
-                chromosome_str = chromosome_str + str(self._data_array[i]) + ", "
+                chromosome_str = chromosome_str + str(self._data_list[i]) + ", "
             if i == (gene_size - 1):
-                chromosome_str = chromosome_str + str(self._data_array[i])
+                chromosome_str = chromosome_str + str(self._data_list[i])
         chromosome_str = chromosome_str + "]"
         print(message, "Chromosome : ", chromosome_str, " ::: Score : ", self.fitness_score)
 
@@ -55,11 +55,11 @@ class Chromosome:
     def set_fitness_score(self, score):
         self.fitness_score = score
 
-    def get_gene_array(self):
-        return self._data_array
+    def get_gene_sequence(self):
+        return self._data_list
 
     def get_all_elements_as_gene(self):
-        return self._gene_array
+        return self._gene_list
 
     """
     Rather than having fixed point crossover for all the parent chromosome, select 
@@ -69,17 +69,17 @@ class Chromosome:
         if not isinstance(other_parent, Chromosome):
             raise TypeError("Invalid argument passed - only object of type Chromosome is allowed.")
 
-        if len(other_parent.get_gene_array()) != len(self.get_gene_array()):
+        if len(other_parent.get_gene_sequence()) != len(self.get_gene_sequence()):
             raise TypeError(
                 "Invalid argument passed - chromosome passed as argument does not have same number of Gene.")
 
-        index_crossover_array = [i for i in range(len(self.get_gene_array()))]
+        index_crossover_array = [i for i in range(len(self.get_gene_sequence()))]
         index_crossover = GeneticAlgorithmUtils.get_random_number_from_list(index_crossover_array)
-        if index_crossover == 0 or index_crossover == (len(self.get_gene_array()) - 1):
-            index_crossover = int(len(self.get_gene_array()) / 2)
-        # index_crossover = int(len(self.get_gene_array()) / 2)
-        parent_1_data = self.get_gene_array()
-        parent_2_data = other_parent.get_gene_array()
+        if index_crossover == 0 or index_crossover == (len(self.get_gene_sequence()) - 1):
+            index_crossover = int(len(self.get_gene_sequence()) / 2)
+
+        parent_1_data = self.get_gene_sequence()
+        parent_2_data = other_parent.get_gene_sequence()
         child_data_1 = parent_1_data[0:index_crossover]
         child_data_2 = parent_2_data[0:index_crossover]
         child_data_1.extend(parent_2_data[index_crossover:])
@@ -89,20 +89,24 @@ class Chromosome:
         child_2 = Chromosome(child_data_2)
         return child_1, child_2
 
+    """
+    This method selects two index numbers randomly. Then it swaps the value of the elements.
+    
+    """
     def mutation(self):
-        if len(self._data_array) == 2:
+        if len(self._data_list) == 2:
             _index_1_of_mutation = 1
             _index_2_of_mutation = 0
         else:
-            _random_sample_index_array = random.sample(range(len(self._data_array)), 2)
+            _random_sample_index_array = random.sample(range(len(self._data_list)), 2)
             _index_1_of_mutation = _random_sample_index_array[0]
             _index_2_of_mutation = _random_sample_index_array[1]
 
-        self._data_array[_index_1_of_mutation], self._data_array[_index_2_of_mutation] = self._data_array[
+        self._data_list[_index_1_of_mutation], self._data_list[_index_2_of_mutation] = self._data_list[
                                                                                              _index_2_of_mutation], \
-                                                                                         self._data_array[
+                                                                                       self._data_list[
                                                                                              _index_1_of_mutation]
-        point = Gene(_index_1_of_mutation, self._data_array[_index_1_of_mutation])
-        self._gene_array[_index_1_of_mutation] = point
-        point = Gene(_index_2_of_mutation, self._data_array[_index_2_of_mutation])
-        self._gene_array[_index_2_of_mutation] = point
+        point = Gene(_index_1_of_mutation, self._data_list[_index_1_of_mutation])
+        self._gene_list[_index_1_of_mutation] = point
+        point = Gene(_index_2_of_mutation, self._data_list[_index_2_of_mutation])
+        self._gene_list[_index_2_of_mutation] = point
