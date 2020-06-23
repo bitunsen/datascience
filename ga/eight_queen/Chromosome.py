@@ -61,6 +61,10 @@ class Chromosome:
     def get_all_elements_as_gene(self):
         return self._gene_array
 
+    """
+    Rather than having fixed point crossover for all the parent chromosome, select 
+    the crossover point randomly. This introduces more randomness in the chromosome during crossover 
+    """
     def crossover(self, other_parent):
         if not isinstance(other_parent, Chromosome):
             raise TypeError("Invalid argument passed - only object of type Chromosome is allowed.")
