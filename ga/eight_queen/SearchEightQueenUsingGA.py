@@ -95,7 +95,7 @@ class GAExecution:
         :type input_chromosome: Chromosome
         """
         _data = input_chromosome.get_gene_array()[:]
-        _non_attacking_queen = [0, 0, 0, 0, 0, 0, 0, 0]
+        _non_attacking_queen = [0 for i in range(self._length_of_chromosome)]
         for index in range(len(_data)):
             current_point = Gene(index, _data[index])
             # current_point.print("Current Queen :: ")
@@ -217,7 +217,8 @@ class GAExecution:
         # Sorting (in ascending order) all the chromosomes present in the population pool
         self._population_pool = sorted(self._population_pool, key=lambda element: element.fitness_score,
                                        reverse=True)
-        # print("-------------- AFTER CROSSOVER AND MUTATION AND SORTING OF PARENT SELECTION --------------------------")
+        # print("-------------- AFTER CROSSOVER AND MUTATION AND SORTING OF PARENT SELECTION
+        # --------------------------")
 
         # for _chromosome in self._population_pool:
         #    _chromosome.print_chromosome("[GEN - " + str(self._current_generation) + "] :: New Child :: ")
@@ -227,15 +228,17 @@ class GAExecution:
 
 if __name__ == "__main__":
 
-    valid_data = [i for i in range(8)]
-    engine = GAExecution(100, 8, 0.01)
+    number_of_queens = 8
+    valid_data = [i for i in range(number_of_queens)]
+    engine = GAExecution(100, number_of_queens, 0.01)
     current_generation = 1
     _max_generation = 2000
-    target_chromosome_array = [Chromosome([0, 0, 0, 0, 0, 0, 0, 0])]
+    target_chromosome_array = [Chromosome([0 for i in range(number_of_queens)])]
     _initial_population_pool = engine.generate_initial_population()
     _max_scored_chromosome = _initial_population_pool[0]
+    _max_possible_score = number_of_queens * (number_of_queens - 1)
 
-    if _max_scored_chromosome.get_fitness_score() == 56:
+    if _max_scored_chromosome.get_fitness_score() == _max_possible_score:
         target_chromosome_array[0] = _max_scored_chromosome
         _max_scored_chromosome.print_chromosome(
             "Generation #" + str(current_generation) + " Target Chromosome :: ")
@@ -248,7 +251,7 @@ if __name__ == "__main__":
             current_generation = current_generation + 1
             engine.set_current_generation(current_generation)
 
-            if _max_scored_chromosome.get_fitness_score() == 56:
+            if _max_scored_chromosome.get_fitness_score() == _max_possible_score:
                 target_chromosome_array[0] = _max_scored_chromosome
                 _max_scored_chromosome.print_chromosome(
                     "Generation #" + str(current_generation) + " Target Chromosome :: ")
