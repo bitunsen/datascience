@@ -33,11 +33,20 @@ class GAExecution:
     _valid_gene_data = []
     _population_pool = []
     _mutation_rate = 0.01
-    _max_generation = 2000
+    _max_generation = 3000
     _system_random = random.SystemRandom()
     _current_generation = 0
 
     def __init__(self, size_of_population, num_of_queens, mutation_rate):
+        if not isinstance(size_of_population, int):
+            raise TypeError("Invalid input provided - Size of population must of a positive Integer")
+
+        if not isinstance(num_of_queens, int):
+            raise TypeError("Invalid input provided - Number of Queens must of a positive Integer")
+
+        if num_of_queens != 8:
+            raise ValueError("WARNING - This program is not optimized to handle number of queens greater than 8.")
+
         self._size_of_population = size_of_population
 
         self._mutation_rate = mutation_rate
@@ -90,10 +99,9 @@ class GAExecution:
         return len(self._population_pool)
 
     def calculate_fitness_score(self, input_chromosome):
-        """
+        if not isinstance(input_chromosome, Chromosome):
+            raise TypeError("Invalid argument - Only object of type Chromosome is expected.")
 
-        :type input_chromosome: Chromosome
-        """
         _data = input_chromosome.get_gene_array()[:]
         _non_attacking_queen = [0 for i in range(self._length_of_chromosome)]
         for index in range(len(_data)):
@@ -115,6 +123,7 @@ class GAExecution:
             input_chromosome.fitness_score = np.sum(_non_attacking_queen)
         return input_chromosome.fitness_score
 
+    # This method assumes that the chromosome pool is already sorted
     # Take half of the high scored parents for producing next generation kids
     def run_parent_selection_process(self):
         _max_score = 0
@@ -132,6 +141,7 @@ class GAExecution:
 
     # Select parents using tournament process
     # Using Tournament process, Only half of the parents will be selected for reproduction
+    # This method will not be used as tournament based parent selection didn't give good results
     def run_parent_selection_process_tournament(self):
         _max_score = 0
         _score_array = []
