@@ -73,7 +73,7 @@ class GAExecution:
             gene_array = self._valid_gene_data[:]
             random.shuffle(gene_array)
             # print("Gene Array :: ", gene_array)
-            _initial_chromosome = Chromosome(gene_array, self._valid_gene_data)
+            _initial_chromosome = Chromosome(gene_array)
             _chromosome_score = self.calculate_fitness_score(_initial_chromosome)
             self._population_pool.append(_initial_chromosome)
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     engine = GAExecution(100, 8, 0.01)
     current_generation = 1
     _max_generation = 2000
-    target_chromosome_array = [Chromosome([0, 0, 0, 0, 0, 0, 0, 0], valid_data)]
+    target_chromosome_array = [Chromosome([0, 0, 0, 0, 0, 0, 0, 0])]
     _initial_population_pool = engine.generate_initial_population()
     _max_scored_chromosome = _initial_population_pool[0]
 
