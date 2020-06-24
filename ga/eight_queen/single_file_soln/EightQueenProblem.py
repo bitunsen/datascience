@@ -65,16 +65,16 @@ class Chromosome:
         self._data_list = []
         self._gene_list = []
         self.fitness_score = 0
-        self._mutate_ratio = 0.0
+        self._unique_ratio = 0.0
 
         self._data_list = _input_data_list[:]
         for i in range(len(_input_data_list)):
             _point = Gene(i, _input_data_list[i])
             self._gene_list.append(_point)
-        _mutate_ratio = (len(set(_input_data_list)) / len(_input_data_list))
+        self._unique_ratio = (len(set(_input_data_list)) / len(_input_data_list))
 
-    def get_mutate_ratio(self):
-        return self._mutate_ratio
+    def get_unique_ratio(self):
+        return self._unique_ratio
 
     def print_chromosome(self, message):
         gene_size = len(self._data_list)
@@ -85,7 +85,8 @@ class Chromosome:
             if i == (gene_size - 1):
                 chromosome_str = chromosome_str + str(self._data_list[i])
         chromosome_str = chromosome_str + "]"
-        print(message, "Chromosome : ", chromosome_str, " ::: Score : ", self.fitness_score)
+        print(message, "Chromosome : ", chromosome_str, " ::: Score : ", self.fitness_score,
+              " :: Unique Ration :: ", self.get_unique_ratio())
 
     def get_fitness_score(self):
         return self.fitness_score
@@ -123,6 +124,16 @@ class Chromosome:
         child_data_2 = parent_2_data[0:index_crossover]
         child_data_1.extend(parent_2_data[index_crossover:])
         child_data_2.extend(parent_1_data[index_crossover:])
+
+        _random_sample_index_array = random.sample(range(len(child_data_1)), 2)
+        _index_1 = _random_sample_index_array[0]
+        _index_2 = _random_sample_index_array[1]
+        child_data_1[_index_1], child_data_1[_index_2] = child_data_1[_index_2], child_data_1[_index_1]
+
+        _random_sample_index_array = random.sample(range(len(child_data_2)), 2)
+        _index_1 = _random_sample_index_array[0]
+        _index_2 = _random_sample_index_array[1]
+        child_data_2[_index_1], child_data_2[_index_2] = child_data_2[_index_2], child_data_2[_index_1]
 
         child_1 = Chromosome(child_data_1)
         child_2 = Chromosome(child_data_2)
@@ -175,15 +186,7 @@ def get_all_attacking_points_from_one_point(x_cor, y_cor, num_of_queens):
 
 
 class GAContext:
-    _attacking_point_dictionary = {}
-    _size_of_population = 0
-    _length_of_chromosome = 0
-    _valid_gene_data = []
-    _population_pool = []
-    _mutation_rate = 0.01
-    _max_generation = 3000
-    _system_random = random.SystemRandom()
-    _current_generation = 0
+
 
     def __init__(self, size_of_population, num_of_queens, mutation_rate):
         if not isinstance(size_of_population, int):
@@ -195,6 +198,12 @@ class GAContext:
         if num_of_queens != 8:
             raise ValueError("WARNING - This program is not optimized to handle number of queens greater than 8.")
 
+        self._attacking_point_dictionary = {}
+        self._valid_gene_data = []
+        self._population_pool = []
+        self._max_generation = 3000
+        self._system_random = random.SystemRandom()
+        self._current_generation = 0
         self._size_of_population = size_of_population
 
         self._mutation_rate = mutation_rate
@@ -318,7 +327,7 @@ def generate_initial_population(_context):
     return _context.get_population_pool()
 
 
-def calculate_fitness_score(_context, input_chromosome):
+def calculate_fitness_score_sum(_context, input_chromosome):
     if not isinstance(input_chromosome, Chromosome):
         raise TypeError("Invalid argument - Only object of type Chromosome is expected.")
 
@@ -341,6 +350,32 @@ def calculate_fitness_score(_context, input_chromosome):
         _non_attacking_queen[index] = ((len(_data) - 1) - attacking_queen)
         # print(non_attacking_queen)
         input_chromosome.fitness_score = np.sum(_non_attacking_queen)
+    return input_chromosome.fitness_score
+
+
+def calculate_fitness_score(_context, input_chromosome):
+    if not isinstance(input_chromosome, Chromosome):
+        raise TypeError("Invalid argument - Only object of type Chromosome is expected.")
+
+    _data = input_chromosome.get_gene_sequence()[:]
+    _non_attacking_queen = [0 for i in range(_context.get_num_of_queens())]
+    for index in range(len(_data)):
+        current_point = Gene(index, _data[index])
+        # current_point.print("Current Queen :: ")
+        attacking_queen = 0
+        current_attacking_points = _context.get_all_attacking_points_from_dictionary(current_point)
+        for i in range(len(_data)):
+            if i == index:
+                continue
+            other_queen = Gene(i, _data[i])
+            for attacking_point in current_attacking_points:
+                if other_queen.equals(attacking_point):
+                    attacking_queen = attacking_queen + 1
+                    # other_queen.print("Attacking Queen :: ")
+
+        _non_attacking_queen[index] = ((len(_data) - 1) - attacking_queen)
+        # print(non_attacking_queen)
+        input_chromosome.fitness_score = int(input_chromosome.get_unique_ratio() * np.sum(_non_attacking_queen))
     return input_chromosome.fitness_score
 
 
@@ -380,10 +415,10 @@ def execute_crossover_mutation(_context, _selected_parent_pool):
         _parent_2 = _mating_pool[(2 * _index) + 1]
         _child_1, _child_2 = _parent_1.crossover(_parent_2)
 
-        if _child_1.get_mutate_ratio() < 0.6:
-            _child_1.mutation()
-        if _child_2.get_mutate_ratio() < 0.6:
-            _child_2.mutation()
+        # if _child_1.get_mutate_ratio() < 0.6:
+        #    _child_1.mutation()
+        # if _child_2.get_mutate_ratio() < 0.6:
+        #    _child_2.mutation()
 
         calculate_fitness_score(_context, _child_1)
         calculate_fitness_score(_context, _child_2)
