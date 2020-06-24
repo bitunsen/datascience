@@ -48,10 +48,6 @@ It is calculated by dividing the number of unique elements by the length of data
 
 
 class Chromosome:
-    _data_list = []
-    _gene_list = []
-    fitness_score = 0
-    _mutate_ratio = 0.0
 
     def __init__(self, _input_data_list):
         if not isinstance(_input_data_list, list):
@@ -65,6 +61,11 @@ class Chromosome:
                 raise TypeError("Invalid argument passed - only array of positive integers are allowed.")
             if _element < 0:
                 raise TypeError("Invalid argument passed - only array of positive integers are allowed.")
+
+        self._data_list = []
+        self._gene_list = []
+        self.fitness_score = 0
+        self._mutate_ratio = 0.0
 
         self._data_list = _input_data_list[:]
         for i in range(len(_input_data_list)):
